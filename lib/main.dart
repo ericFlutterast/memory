@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:game_of_guess_the_color/pages/game_field_page/game_field.dart';
 
-import 'game_field_page/game_field.dart';
+import 'bloc/memore_bloc_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,8 +13,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: GameField(),
+    final MemoreBlocBloc bloc = MemoreBlocBloc();
+
+    return MaterialApp(
+      home: BlocProvider<MemoreBlocBloc>(
+        create: (context) => MemoreBlocBloc(),
+        child: GameField(bloc: bloc),
+      ),
     );
   }
 }

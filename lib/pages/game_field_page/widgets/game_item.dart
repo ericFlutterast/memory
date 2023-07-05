@@ -1,12 +1,18 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:game_of_guess_the_color/bloc/memore_bloc_bloc.dart';
 
 class GameItem extends StatefulWidget {
+  final int i;
+  final int j;
   final Color color;
   const GameItem({
     super.key,
     required this.color,
+    required this.i,
+    required this.j,
   });
 
   @override
@@ -51,12 +57,6 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
 
     _animationController.reverse();
 
-    await Future.delayed(const Duration(seconds: 1));
-
-    _isEquals = true;
-
-    _animationController.forward();
-
     setState(() {});
   }
 
@@ -81,12 +81,19 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
                   child: InkWell(
                     onTap: () {
                       runAnimation();
+                      context.read<MemoreBlocBloc>().add(
+                            ShowColorMemoreBlocEvent(
+                              color: widget.color,
+                              i: widget.i,
+                              j: widget.j,
+                            ),
+                          );
                     },
                     child: Container(
                       height: 75,
                       width: 75,
                       decoration: BoxDecoration(
-                        color: _reversValue.value < 0.5
+                        color: _reversValue.value > 0.5
                             ? Colors.orange
                             : widget.color,
                         border: Border.all(color: Colors.grey),
