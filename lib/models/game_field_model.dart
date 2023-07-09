@@ -10,7 +10,7 @@ class GameItemModel {
     required this.color,
     required this.indexI,
     required this.indexJ,
-    this.isRemove = true,
+    this.isRemove = false,
   });
 }
 

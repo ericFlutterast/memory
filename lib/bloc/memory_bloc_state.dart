@@ -1,16 +1,13 @@
-part of 'memore_bloc_bloc.dart';
+part of 'memory_bloc.dart';
 
 class MemoryBlocState {
   List<RowModel> contentMatrix;
-  ShowColorMemoryBlocEvent? prevEvent;
 
-  MemoryBlocState({this.contentMatrix = const [], this.prevEvent});
+  MemoryBlocState({this.contentMatrix = const []});
 
-  MemoryBlocState copyWith(
-      {List<RowModel>? newMatrix, ShowColorMemoryBlocEvent? newEvent}) {
+  MemoryBlocState copyWith({List<RowModel>? newMatrix}) {
     return MemoryBlocState(
       contentMatrix: newMatrix ?? contentMatrix,
-      prevEvent: newEvent ?? prevEvent,
     );
   }
 

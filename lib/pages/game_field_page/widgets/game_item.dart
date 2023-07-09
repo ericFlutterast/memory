@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:game_of_guess_the_color/bloc/memore_bloc_bloc.dart';
+import 'package:game_of_guess_the_color/bloc/memory_bloc.dart';
 
 class GameItem extends StatefulWidget {
   final int i;
@@ -32,7 +32,7 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
     super.initState();
 
     _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 800));
+        vsync: this, duration: const Duration(milliseconds: 500));
 
     _collapsesValue =
         Tween<double>(begin: 1, end: 0).animate(_animationController)
@@ -44,10 +44,6 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
       ..addListener(() {
         setState(() {});
       });
-
-    if (widget.isRemove) {
-      _animationController.forward();
-    }
   }
 
   @override
@@ -61,7 +57,9 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
 
     await Future.delayed(const Duration(milliseconds: 1500));
 
-    _animationController.reverse();
+    if (!widget.isRemove) {
+      _animationController.reverse();
+    }
 
     setState(() {});
   }
@@ -87,22 +85,25 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
                   child: InkWell(
                     onTap: () {
                       runAnimation();
-                      context.read<MemoryBlocBloc>().add(
-                            ShowColorMemoryBlocEvent(
+                      context.read<MemoryBloc>().add(
+                            SelectGameElementEvent(
                               color: widget.color,
                               i: widget.i,
                               j: widget.j,
                             ),
                           );
+                      //setState(() {});
                     },
                     child: Container(
-                      height: 75,
-                      width: 75,
+                      height: MediaQuery.of(context).size.width / 6,
+                      width: MediaQuery.of(context).size.width / 6,
                       decoration: BoxDecoration(
                         color: _reversValue.value > 0.5
                             ? widget.color
                             : Colors.orange,
-                        border: Border.all(color: Colors.grey),
+                        border: Border.all(
+                          color: const Color.fromARGB(71, 73, 73, 73),
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),

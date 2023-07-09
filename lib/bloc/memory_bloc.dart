@@ -7,38 +7,43 @@ import 'package:flutter/material.dart';
 
 import '../models/game_field_model.dart';
 
-part 'memore_bloc_event.dart';
-part 'memore_bloc_state.dart';
+part 'memory_bloc_event.dart';
+part 'memory_bloc_state.dart';
 
-class MemoryBlocBloc extends Bloc<MemoreBlocEvent, MemoryBlocState> {
-  MemoryBlocBloc() : super(MemoryBlocState()) {
-    on<ShowColorMemoryBlocEvent>(_snowColor);
+class MemoryBloc extends Bloc<MemoryBlocEvent, MemoryBlocState> {
+  SelectGameElementEvent? prevEvent;
+
+  MemoryBloc() : super(MemoryBlocState()) {
+    on<SelectGameElementEvent>(_snowColor);
     on<InitDataBlocEvent>(_initState);
   }
 
   void _snowColor(
-      ShowColorMemoryBlocEvent event, Emitter<MemoryBlocState> emit) {
-    List<RowModel> matrix = state.contentMatrix;
+      SelectGameElementEvent event, Emitter<MemoryBlocState> emit) async {
+    if (prevEvent == null || prevEvent!.color != event.color) {
+      prevEvent = event;
+    } else if (prevEvent!.color == event.color &&
+        prevEvent!.getIndex != event.getIndex) {
+      List<RowModel> newState = [...state.contentMatrix];
 
-    matrix[0].listOfGameItem[0].isRemove = true;
-    emit(state.copyWith(newMatrix: matrix));
+      newState[event.i].listOfGameItem[event.j].isRemove = true;
+      newState[prevEvent!.i].listOfGameItem[prevEvent!.j].isRemove = true;
 
-    // if (state.prevEvent == null) {
-    //   emit(state.copyWith(newEvent: event));
-    // } else if (state.prevEvent!.color == event.color) {
-    //   matrix[state.prevEvent!.i].listOfGameItem[state.prevEvent!.j].isRemove =
-    //       false;
-    //   matrix[event.i].listOfGameItem[event.j].isRemove = false;
-    //   emit(state.copyWith(newMatrix: matrix, newEvent: null));
-    // }
+      prevEvent = null;
+
+      print('equals');
+      emit(state.copyWith(newMatrix: newState));
+    }
   }
 
   void _initState(
       InitDataBlocEvent event, Emitter<MemoryBlocState> emit) async {
+    prevEvent = null;
+
     final List<_ColorCounter> listOfColors =
         List.generate(20, (index) => _ColorCounter(color: _generateColor()));
 
-    final List<RowModel> matrixContent = List.generate(
+    final List<RowModel> newMatrix = List.generate(
         8,
         (indexI) => RowModel(List.generate(
               5,
@@ -62,7 +67,7 @@ class MemoryBlocBloc extends Bloc<MemoreBlocEvent, MemoryBlocState> {
               },
             )));
 
-    emit(state.copyWith(newMatrix: matrixContent));
+    emit(state.copyWith(newMatrix: newMatrix));
   }
 
   Color _generateColor() {

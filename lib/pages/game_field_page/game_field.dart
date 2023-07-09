@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_of_guess_the_color/pages/game_field_page/widgets/game_item.dart';
 
-import '../../bloc/memore_bloc_bloc.dart';
+import '../../bloc/memory_bloc.dart';
 import '../../models/game_field_model.dart';
 
 class GameField extends StatefulWidget {
@@ -15,52 +15,73 @@ class GameField extends StatefulWidget {
 }
 
 class _GameFieldState extends State<GameField> {
-  @override
-  void initState() {
-    super.initState();
+  Key key = UniqueKey();
 
-    context.read<MemoryBlocBloc>().add(InitDataBlocEvent());
-
-    setState(() {});
+  void restartApp() {
+    setState(() {
+      key = UniqueKey();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 222, 222, 222),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Center(
-            child: BlocBuilder<MemoryBlocBloc, MemoryBlocState>(
+            child: BlocBuilder<MemoryBloc, MemoryBlocState>(
+              buildWhen: (previous, current) =>
+                  previous.contentMatrix != current.contentMatrix,
               builder: (context, state) {
                 if (state.contentMatrix.isEmpty) {
                   return const CircularProgressIndicator.adaptive();
                 }
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: state.contentMatrix.length,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return RowItem(
-                        listOfGameItem:
-                            state.contentMatrix[index].listOfGameItem,
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
-                  ),
+                return ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: state.contentMatrix.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return RowItem(
+                      listOfGameItem: state.contentMatrix[index].listOfGameItem,
+                    );
+                  },
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
                 );
               },
             ),
           ),
+          const SizedBox(height: 20),
           ElevatedButton(
-              onPressed: () {
-                context.read<MemoryBlocBloc>().add(InitDataBlocEvent());
-              },
-              child: const Text('play again')),
+            onPressed: () {
+              context.read<MemoryBloc>().add(InitDataBlocEvent());
+              //runApp(const GameField());
+            },
+            style: ButtonStyle(
+              shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+              backgroundColor:
+                  const MaterialStatePropertyAll(Colors.transparent),
+              iconColor: const MaterialStatePropertyAll(Colors.black),
+              overlayColor: const MaterialStatePropertyAll(
+                  Color.fromARGB(52, 143, 143, 143)),
+              shape: MaterialStatePropertyAll(
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              ),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+              child: Column(
+                children: [
+                  Icon(Icons.replay_outlined),
+                  Text(
+                    'play again',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
