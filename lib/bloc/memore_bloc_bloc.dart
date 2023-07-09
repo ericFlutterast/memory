@@ -5,67 +5,64 @@ import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 
-import 'package:game_of_guess_the_color/pages/game_field_page/widgets/game_item.dart';
-
 import '../models/game_field_model.dart';
 
 part 'memore_bloc_event.dart';
 part 'memore_bloc_state.dart';
 
-class MemoreBlocBloc extends Bloc<MemoreBlocEvent, MemoryBlocInitial> {
-  //Color? _prevColor;
-
-  MemoreBlocBloc() : super(MemoryBlocInitial()) {
-    on<ShowColorMemoreBlocEvent>(_snowColor);
+class MemoryBlocBloc extends Bloc<MemoreBlocEvent, MemoryBlocState> {
+  MemoryBlocBloc() : super(MemoryBlocState()) {
+    on<ShowColorMemoryBlocEvent>(_snowColor);
     on<InitDataBlocEvent>(_initState);
   }
 
   void _snowColor(
-      ShowColorMemoreBlocEvent event, Emitter<MemoryBlocInitial> emit) {
-    // if (_prevColor == null) {
-    //   _prevColor = event.color;
-    // } else {
-    //   if (_prevColor == event.color) {
-    //     _prevColor = null;
-    //     print('equals');
-    //   }
-    // }
+      ShowColorMemoryBlocEvent event, Emitter<MemoryBlocState> emit) {
+    List<RowModel> matrix = state.contentMatrix;
 
-    print('${event.color}, ${event.i}, ${event.j}');
+    matrix[0].listOfGameItem[0].isRemove = true;
+    emit(state.copyWith(newMatrix: matrix));
+
+    // if (state.prevEvent == null) {
+    //   emit(state.copyWith(newEvent: event));
+    // } else if (state.prevEvent!.color == event.color) {
+    //   matrix[state.prevEvent!.i].listOfGameItem[state.prevEvent!.j].isRemove =
+    //       false;
+    //   matrix[event.i].listOfGameItem[event.j].isRemove = false;
+    //   emit(state.copyWith(newMatrix: matrix, newEvent: null));
+    // }
   }
 
   void _initState(
-      InitDataBlocEvent event, Emitter<MemoryBlocInitial> emit) async {
-    final List<ColorCounter> listOfColors =
-        List.generate(20, (index) => ColorCounter(color: _generateColor()));
-
-    const int i = 8;
-    const int j = 5;
+      InitDataBlocEvent event, Emitter<MemoryBlocState> emit) async {
+    final List<_ColorCounter> listOfColors =
+        List.generate(20, (index) => _ColorCounter(color: _generateColor()));
 
     final List<RowModel> matrixContent = List.generate(
-        i,
-        (index) => RowModel(
-            i: i - 1,
-            List.generate(
-              j,
-              (index) {
+        8,
+        (indexI) => RowModel(List.generate(
+              5,
+              (indexJ) {
+                Color targetColor = Colors.white;
                 int index = Random().nextInt(listOfColors.length);
-                if (listOfColors[index].counter == 2) {
-                  listOfColors.removeAt(index);
-                  index = Random().nextInt(listOfColors.length);
+
+                if (listOfColors[index].counter < 2) {
+                  targetColor = listOfColors[index].color;
+                  listOfColors[index].counter++;
+                  if (listOfColors[index].counter == 2) {
+                    listOfColors.removeAt(index);
+                  }
                 }
 
-                listOfColors[index].counter++;
-
-                return GameItem(
-                  color: listOfColors[index].color,
-                  i: i - 1,
-                  j: j - 1,
+                return GameItemModel(
+                  color: targetColor,
+                  indexI: indexI,
+                  indexJ: indexJ,
                 );
               },
             )));
 
-    emit(state.copyWith(newState: matrixContent));
+    emit(state.copyWith(newMatrix: matrixContent));
   }
 
   Color _generateColor() {
@@ -74,12 +71,11 @@ class MemoreBlocBloc extends Bloc<MemoreBlocEvent, MemoryBlocInitial> {
   }
 }
 
-class ColorCounter {
+class _ColorCounter {
   final Color color;
-  int counter;
+  int counter = 0;
 
-  ColorCounter({
+  _ColorCounter({
     required this.color,
-    this.counter = 0,
   });
 }

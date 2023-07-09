@@ -13,12 +13,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MemoreBlocBloc bloc = MemoreBlocBloc();
-
     return MaterialApp(
-      home: BlocProvider<MemoreBlocBloc>(
-        create: (context) => MemoreBlocBloc(),
-        child: GameField(bloc: bloc),
+      home: BlocProvider<MemoryBlocBloc>(
+        create: (context) => MemoryBlocBloc(),
+        child: const GameField(),
       ),
     );
   }

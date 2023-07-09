@@ -8,11 +8,14 @@ class GameItem extends StatefulWidget {
   final int i;
   final int j;
   final Color color;
+  final bool isRemove;
+
   const GameItem({
     super.key,
     required this.color,
     required this.i,
     required this.j,
+    required this.isRemove,
   });
 
   @override
@@ -23,7 +26,6 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _collapsesValue;
   late Animation<double> _reversValue;
-  bool _isEquals = false;
 
   @override
   void initState() {
@@ -42,6 +44,10 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
       ..addListener(() {
         setState(() {});
       });
+
+    if (widget.isRemove) {
+      _animationController.forward();
+    }
   }
 
   @override
@@ -76,13 +82,13 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Transform(
-                  transform: _isEquals ? revers : collapse,
+                  transform: widget.isRemove ? revers : collapse,
                   alignment: FractionalOffset.center,
                   child: InkWell(
                     onTap: () {
                       runAnimation();
-                      context.read<MemoreBlocBloc>().add(
-                            ShowColorMemoreBlocEvent(
+                      context.read<MemoryBlocBloc>().add(
+                            ShowColorMemoryBlocEvent(
                               color: widget.color,
                               i: widget.i,
                               j: widget.j,
@@ -94,8 +100,8 @@ class _GameItemState extends State<GameItem> with TickerProviderStateMixin {
                       width: 75,
                       decoration: BoxDecoration(
                         color: _reversValue.value > 0.5
-                            ? Colors.orange
-                            : widget.color,
+                            ? widget.color
+                            : Colors.orange,
                         border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.circular(12),
                       ),

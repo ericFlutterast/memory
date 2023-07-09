@@ -1,10 +1,25 @@
-import 'package:game_of_guess_the_color/pages/game_field_page/widgets/game_item.dart';
+import 'dart:ui';
+
+class GameItemModel {
+  final Color color;
+  final int indexI;
+  final int indexJ;
+  bool isRemove;
+
+  GameItemModel({
+    required this.color,
+    required this.indexI,
+    required this.indexJ,
+    this.isRemove = true,
+  });
+}
 
 class RowModel {
-  final int i;
-  List<GameItem> listOfGameItem;
+  List<GameItemModel> listOfGameItem;
 
-  RowModel(this.listOfGameItem, {required this.i});
+  RowModel(
+    this.listOfGameItem,
+  );
 }
 
 class GameFieldModel {
