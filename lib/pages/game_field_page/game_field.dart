@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:game_of_guess_the_color/pages/game_field_page/widgets/game_item.dart';
+import 'package:game_of_guess_the_color/widgets/play_button.dart';
 
 import '../../bloc/memory_bloc.dart';
 import '../../models/game_field_model.dart';
@@ -17,10 +18,11 @@ class GameField extends StatefulWidget {
 class _GameFieldState extends State<GameField> {
   Key key = UniqueKey();
 
-  void restartApp() {
-    setState(() {
-      key = UniqueKey();
-    });
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<MemoryBloc>().add(InitDataBlocEvent());
   }
 
   @override
@@ -28,6 +30,7 @@ class _GameFieldState extends State<GameField> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 222, 222, 222),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Center(
             child: BlocBuilder<MemoryBloc, MemoryBlocState>(
@@ -53,34 +56,10 @@ class _GameFieldState extends State<GameField> {
             ),
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              context.read<MemoryBloc>().add(InitDataBlocEvent());
-              //runApp(const GameField());
-            },
-            style: ButtonStyle(
-              shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-              backgroundColor:
-                  const MaterialStatePropertyAll(Colors.transparent),
-              iconColor: const MaterialStatePropertyAll(Colors.black),
-              overlayColor: const MaterialStatePropertyAll(
-                  Color.fromARGB(52, 143, 143, 143)),
-              shape: MaterialStatePropertyAll(
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-              ),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-              child: Column(
-                children: [
-                  Icon(Icons.replay_outlined),
-                  Text(
-                    'play again',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
+          const PlayButton(
+            title: 'play again',
+            icon: Icon(Icons.replay_outlined),
+            routWay: '/home_page',
           ),
         ],
       ),

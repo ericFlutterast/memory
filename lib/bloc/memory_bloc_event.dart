@@ -17,4 +17,10 @@ class SelectGameElementEvent implements MemoryBlocEvent {
   (int, int) get getIndex => (i, j);
 }
 
+class InitialValueForGame implements MemoryBlocEvent {
+  final String value;
+
+  InitialValueForGame({required this.value});
+}
+
 class InitDataBlocEvent implements MemoryBlocEvent {}

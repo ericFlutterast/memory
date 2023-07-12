@@ -16,6 +16,7 @@ class MemoryBloc extends Bloc<MemoryBlocEvent, MemoryBlocState> {
   MemoryBloc() : super(MemoryBlocState()) {
     on<SelectGameElementEvent>(_snowColor);
     on<InitDataBlocEvent>(_initState);
+    on<InitialValueForGame>(_initialSizeField);
   }
 
   void _snowColor(
@@ -31,22 +32,32 @@ class MemoryBloc extends Bloc<MemoryBlocEvent, MemoryBlocState> {
 
       prevEvent = null;
 
-      print('equals');
       emit(state.copyWith(newMatrix: newState));
     }
+  }
+
+  _initialSizeField(InitialValueForGame event, Emitter<MemoryBlocState> emit) {
+    int j = int.parse(event.value[0]);
+    int i = int.parse(event.value[event.value.length - 1]);
+
+    emit(state.copyWith(i: i, j: j));
   }
 
   void _initState(
       InitDataBlocEvent event, Emitter<MemoryBlocState> emit) async {
     prevEvent = null;
 
-    final List<_ColorCounter> listOfColors =
-        List.generate(20, (index) => _ColorCounter(color: _generateColor()));
+    var (i, j) = state.getIndex;
+
+    int quantityColors = (i * j ~/ 2);
+
+    final List<_ColorCounter> listOfColors = List.generate(
+        quantityColors, (index) => _ColorCounter(color: _generateColor()));
 
     final List<RowModel> newMatrix = List.generate(
-        8,
+        i,
         (indexI) => RowModel(List.generate(
-              5,
+              j,
               (indexJ) {
                 Color targetColor = Colors.white;
                 int index = Random().nextInt(listOfColors.length);
